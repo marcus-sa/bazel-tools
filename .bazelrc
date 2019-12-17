@@ -12,4 +12,4 @@ build --host_force_python=PY2
 # Specifies desired output mode for running tests.
 test --test_output=errors
 
-import %workspace%/.bazelrc.user
+try-import %workspace%/.bazelrc.user
