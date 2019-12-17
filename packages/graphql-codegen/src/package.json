@@ -1,0 +1,27 @@
+{
+  "name": "@bazel-tools/graphql-codegen",
+  "license": "MIT",
+  "version": "0.0.0-PLACEHOLDER",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marcus-sa/bazel-tools",
+    "directory": "packages/graphql-codegen"
+  },
+  "bugs": {
+    "url": "https://github.com/marcus-sa/bazel-tools/issues"
+  },
+  "keywords": [
+    "bazel",
+    "graphql-codegen"
+  ],
+  "dependencies": {
+    "@graphql-codegen/cli": "1.9.1",
+    "json-to-pretty-yaml": "1.2.2",
+    "listr-update-renderer": "0.5.0"
+  },
+  "bazelWorkspaces": {
+    "npm_bazel_tools_graphql_codegen": {
+      "rootPath": "."
+    }
+  }
+}
