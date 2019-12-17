@@ -1,0 +1,9 @@
+.bazelrc.user
+.idea
+*.tar.gz
+dist
+bazel-out
+/packages/*/bazel-*
+/packages/*/dist-*
+node_modules
+yarn-error.log
