@@ -1,0 +1,7 @@
+{
+	"name": "bazel_tools",
+	"devDependencies": {
+		"patch-package": "6.2.0",
+		"prisma2": "2.0.0-preview018.2"
+	}
+}
