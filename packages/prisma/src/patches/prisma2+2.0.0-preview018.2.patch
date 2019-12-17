@@ -1,0 +1,393 @@
+diff --git a/node_modules/prisma2/build/index.js b/node_modules/prisma2/build/index.js
+index 14ff3ee..55abd97 100755
+--- a/node_modules/prisma2/build/index.js
++++ b/node_modules/prisma2/build/index.js
+@@ -12958,9 +12958,9 @@ const __1 = __webpack_require__(5487);
+ const liftEngineCommands_1 = __webpack_require__(1363);
+ const Link_1 = __webpack_require__(6039);
+ const sdk_2 = __webpack_require__(9140);
+-function ensureDatabaseExists(action, killInk, forceCreate = false) {
++function ensureDatabaseExists(action, killInk, datamodelPath, forceCreate = false) {
+     return __awaiter(this, void 0, void 0, function* () {
+-        const datamodel = yield cli_1.getSchema();
++        const datamodel = yield cli_1.getSchema(datamodelPath);
+         const config = yield sdk_1.getConfig({ datamodel });
+         const activeDatasource = config.datasources.length === 1
+             ? config.datasources[0]
+@@ -17401,7 +17401,7 @@ async function getPlatform() {
+     }
+     // if just the distro is known, fallback to latest OpenSSL 1.1
+     if (distro) {
+-        return (distro + 'debian-openssl-1.1.x');
++        return (distro + '-openssl-1.1.x');
+     }
+     // use the debian build with OpenSSL 1.1 as a last resort
+     return 'debian-openssl-1.1.x';
+@@ -77925,7 +77925,7 @@ var Init = /** @class */ (function () {
+                         if (args['--help']) {
+                             return [2 /*return*/, this.help()];
+                         }
+-                        outputDirName = args._[0];
++                        outputDirName = args._[0];1
+                         outputDir = outputDirName ? path_1.default.join(process.cwd(), outputDirName) : process.cwd();
+                         if (fs_1.default.existsSync(outputDir)) {
+                             schemaExists = fs_1.default.existsSync(path_1.default.join(outputDir, 'schema.prisma'));
+@@ -81590,20 +81590,20 @@ const exit_1 = __webpack_require__(6338);
+ const Link_1 = __webpack_require__(6039);
+ const sendPanic_1 = __webpack_require__(6110);
+ function handlePanic(error, cliVersion, binaryVersion) {
+-    return __awaiter(this, void 0, void 0, function* () {
+-        return new Promise(resolve => {
+-            let app;
+-            const onDone = () => __awaiter(this, void 0, void 0, function* () {
+-                if (app) {
+-                    app.unmount();
+-                    app.waitUntilExit();
+-                }
+-                yield exit_1.exit();
+-            });
+-            app = ink_1.render(react_1.default.createElement(ink_components_1.TabIndexProvider, null,
+-                react_1.default.createElement(PanicDialog, { error: error, onDone: onDone, cliVersion: cliVersion, binaryVersion: binaryVersion })));
+-        });
+-    });
++	return __awaiter(this, void 0, void 0, function* () {
++			return new Promise(resolve => {
++					let app;
++					const onDone = () => __awaiter(this, void 0, void 0, function* () {
++							if (app) {
++									app.unmount();
++									app.waitUntilExit();
++							}
++							yield exit_1.exit();
++					});
++					app = ink_1.render(react_1.default.createElement(ink_components_1.TabIndexProvider, null,
++							react_1.default.createElement(PanicDialog, { error: error, onDone: onDone, cliVersion: cliVersion, binaryVersion: binaryVersion })));
++			});
++	});
+ }
+ exports.handlePanic = handlePanic;
+ const PanicDialog = ({ error, onDone, cliVersion, binaryVersion }) => {
+@@ -88437,7 +88437,7 @@ class LiftDown {
+         return new LiftDown();
+     }
+     // parse arguments
+-    parse(argv) {
++    parse(argv, datamodelPath) {
+         return __awaiter(this, void 0, void 0, function* () {
+             // parse the arguments according to the spec
+             const args = cli_1.arg(argv, {
+@@ -88452,7 +88452,7 @@ class LiftDown {
+             else if (args['--help']) {
+                 return this.help();
+             }
+-            const lift = new Lift_1.Lift();
++            const lift = new Lift_1.Lift(process.cwd(), datamodelPath);
+             const options = {};
+             // TODO add go down by name and timestamp
+             if (args._.length > 0) {
+@@ -88466,7 +88466,7 @@ class LiftDown {
+                     options.n = maybeNumber;
+                 }
+             }
+-            yield ensureDatabaseExists_1.ensureDatabaseExists('unapply', true);
++            yield ensureDatabaseExists_1.ensureDatabaseExists('unapply', true, datamodelPath);
+             const result = yield lift.down(options);
+             lift.stop();
+             return result;
+@@ -108208,7 +108208,7 @@ class LiftCommand {
+     static new(cmds) {
+         return new LiftCommand(cmds);
+     }
+-    parse(argv) {
++    parse(argv, datamodelPath) {
+         return __awaiter(this, void 0, void 0, function* () {
+             // parse the arguments according to the spec
+             const args = cli_1.arg(argv, {
+@@ -108231,7 +108231,7 @@ class LiftCommand {
+                     throw new Error(`Cannot run ${chalk_1.default.bold(command)} because there is a ${chalk_1.default.bold('prisma2 dev')} command running in this directory.
+ Please ${theme_1.gamboge(`stop ${chalk_1.default.bold('prisma2 dev')} first`)}, then try ${chalk_1.default.greenBright.bold(command)} again`);
+                 }
+-                return cmd.parse(args._.slice(1));
++                return cmd.parse(args._.slice(1), datamodelPath);
+             }
+             return cli_1.unknownCommand(LiftCommand.help, args._[0]);
+         });
+@@ -108291,6 +108291,7 @@ LiftCommand.help = cli_1.format(`
+ 
+ Object.defineProperty(exports, "__esModule", { value: true });
+ const getProjectPath = (schemaPath) => {
++		console.log('getProjectPath', schemaPath);
+     let projectPath = schemaPath;
+     // Extract project path if the schema is in a prisma directory
+     if (projectPath.endsWith('/prisma/schema.prisma') ||
+@@ -137817,7 +137818,7 @@ class LiftWatch {
+         return new LiftWatch(providerAliases);
+     }
+     // parse arguments
+-    parse(argv) {
++    parse(argv, datamodelPath) {
+         return __awaiter(this, void 0, void 0, function* () {
+             const args = cli_1.arg(argv, {
+                 '--preview': Boolean,
+@@ -137828,8 +137829,8 @@ class LiftWatch {
+             });
+             const preview = args['--preview'] || false;
+             yield occupyPath_1.occupyPath(process.cwd());
+-            yield ensureDatabaseExists_1.ensureDatabaseExists('dev', false, args['--create-db'] || process.platform === 'win32');
+-            const lift = new Lift_1.Lift();
++            yield ensureDatabaseExists_1.ensureDatabaseExists('dev', false, datamodelPath, args['--create-db'] || process.platform === 'win32');
++            const lift = new Lift_1.Lift(process.cwd(), datamodelPath);
+             return lift.watch({
+                 preview,
+                 providerAliases: this.providerAliases,
+@@ -146426,9 +146427,11 @@ function getSchemaDir() {
+     });
+ }
+ exports.getSchemaDir = getSchemaDir;
+-function getSchema() {
++function getSchema(schemaPath) {
+     return __awaiter(this, void 0, void 0, function* () {
+-        const schemaPath = yield getSchemaPath();
++    		if (!schemaPath) {
++					schemaPath = yield getSchemaPath();
++				}
+         if (!schemaPath) {
+             throw new Error(`Could not find schema.prisma`);
+         }
+@@ -151327,7 +151330,7 @@ class LiftSave {
+         return new LiftSave();
+     }
+     // parse arguments
+-    parse(argv) {
++    parse(argv, datamodelPath) {
+         return __awaiter(this, void 0, void 0, function* () {
+             // parse the arguments according to the spec
+             const args = cli_1.arg(argv, {
+@@ -151339,6 +151342,7 @@ class LiftSave {
+                 '-p': '--preview',
+                 '--create-db': Boolean,
+                 '-c': '--create-db',
++                '--migrations': String,
+             });
+             if (cli_1.isError(args)) {
+                 return this.help(args.message);
+@@ -151346,16 +151350,20 @@ class LiftSave {
+             else if (args['--help']) {
+                 return this.help();
+             }
++            if (!args['--migrations']) {
++							const schemaDir = path_1.default.dirname(datamodelPath);
++							args['--migrations'] = path_1.default.join(schemaDir, 'migrations');
++						}
+             const preview = args['--preview'] || false;
+-            yield ensureDatabaseExists_1.ensureDatabaseExists('create', true, args['--create-db']);
+-            const lift = new Lift_1.Lift();
+-            const migration = yield lift.createMigration('DUMMY_NAME');
++            yield ensureDatabaseExists_1.ensureDatabaseExists('create', true, datamodelPath, args['--create-db']);
++            const lift = new Lift_1.Lift(process.cwd(), datamodelPath);
++            const migration = yield lift.createMigration('DUMMY_NAME', args['--migrations']);
+             if (!migration) {
+                 lift.stop();
+                 return `Everything up-to-date\n`; // TODO: find better wording
+             }
+-            const name = preview ? args['--name'] : yield this.name(args['--name']);
+-            const { files, newLockFile, migrationId } = yield lift.save(migration, name, preview);
++            const name = args['--name'];
++            const { files, newLockFile, migrationId } = yield lift.save(migration, args['--migrations'], name, preview);
+             if (migration.warnings && migration.warnings.length > 0) {
+                 console.log(chalk_1.default.bold(`\n\n⚠️  There might be data loss when applying the migration:\n`));
+                 for (const warning of migration.warnings) {
+@@ -151367,11 +151375,10 @@ class LiftSave {
+                 lift.stop();
+                 return `\nRun ${chalk_1.default.greenBright('prisma lift save --name MIGRATION_NAME')} to create the migration\n`;
+             }
+-            yield cli_1.getSchema(); // just to leverage on its error handling
+-            const schemaDir = (yield cli_1.getSchemaDir()); // TODO: Probably getSchemaDir() should return Promise<string> instead of Promise<string | null>
+-            const migrationsDir = path_1.default.join(schemaDir, 'migrations', migrationId);
++            yield cli_1.getSchema(datamodelPath); // just to leverage on its error handling
++            const migrationsDir = path_1.default.join(args['--migrations'], migrationId);
+             yield serializeFileMap_1.serializeFileMap(files, migrationsDir);
+-            const lockFilePath = path_1.default.join(schemaDir, 'migrations', 'lift.lock');
++            const lockFilePath = path_1.default.join(args['--migrations'], 'lift.lock');
+             yield writeFile(lockFilePath, newLockFile);
+             lift.stop();
+             return `\nLift just created your migration ${printMigrationId_1.printMigrationId(migrationId)} in\n\n${chalk_1.default.dim(printFiles_1.printFiles(`migrations/${migrationId}`, files))}\n\nRun ${chalk_1.default.greenBright('prisma2 lift up')} to apply the migration\n`;
+@@ -175905,6 +175912,7 @@ class CLI {
+                 '-h': '--help',
+                 '--version': Boolean,
+                 '-v': '--version',
++                '--schema': String,
+             });
+             if (cli_1.isError(args)) {
+                 return this.help(args.message);
+@@ -175919,7 +175927,19 @@ class CLI {
+             // check if we have that subcommand
+             const cmd = this.cmds[args._[0]];
+             if (cmd) {
+-                return cmd.parse(args._.slice(1));
++								const path = require('path');
++								const schemaIndex = args._.findIndex(arg => arg === '--schema');
++								let schema;
++								if (schemaIndex >= 0) {
++									const workspaceName = path.basename(process.cwd());
++									schema = args._[schemaIndex + 1];
++									if (schema.startsWith(workspaceName)) {
++										schema = schema.replace(workspaceName, '.');
++									}
++									args._.splice(schemaIndex, 2)
++								}
++								schema = path.join(process.cwd(), schema);
++                return cmd.parse(args._.slice(1), schema);
+             }
+             // unknown command
+             return cli_1.unknownCommand(CLI.help, args._[0]);
+@@ -212168,9 +212188,9 @@ async function getPlatform() {
+     if (libssl) {
+         return ('debian-openssl-' + libssl);
+     }
+-    // if just the distro is known, fallback to latest OpenSSL 1.1
++		// if just the distro is known, fallback to latest OpenSSL 1.1
+     if (distro) {
+-        return (distro + 'debian-openssl-1.1.x');
++        return (distro + '-openssl-1.1.x');
+     }
+     // use the debian build with OpenSSL 1.1 as a last resort
+     return 'debian-openssl-1.1.x';
+@@ -215427,7 +215447,7 @@ function main() {
+         process.env.NODE_ENV = 'production';
+         // create a new CLI with our subcommands
+         const cli = CLI_1.CLI.new({
+-            init: introspection_1.Init.new(),
++            // init: introspection_1.Init.new(),
+             lift: lift_2.LiftCommand.new({
+                 save: lift_2.LiftSave.new(),
+                 up: lift_2.LiftUp.new(),
+@@ -233744,10 +233764,12 @@ class Generate {
+         return new Generate();
+     }
+     // parse arguments
+-    parse(argv, minimalOutput = false) {
++    parse(argv, datamodelPath, minimalOutput = false) {
+         var _a, _b, _c, _d;
+         return __awaiter(this, void 0, void 0, function* () {
+-            const datamodelPath = yield cli_1.getSchemaPath();
++            if (!datamodelPath) {
++							datamodelPath = yield cli_1.getSchemaPath();
++						}
+             if (!datamodelPath) {
+                 throw new Error(`Can't find schema.prisma`); // TODO: Add this into a central place in getSchemaPath() as an arg
+             }
+@@ -247183,7 +247205,7 @@ class LiftUp {
+         return new LiftUp();
+     }
+     // parse arguments
+-    parse(argv) {
++    parse(argv, datamodelPath) {
+         return __awaiter(this, void 0, void 0, function* () {
+             // parse the arguments according to the spec
+             const args = cli_1.arg(argv, {
+@@ -247203,7 +247225,7 @@ class LiftUp {
+             else if (args['--help']) {
+                 return this.help();
+             }
+-            const lift = new Lift_1.Lift();
++            const lift = new Lift_1.Lift(process.cwd(), datamodelPath);
+             const options = {
+                 preview: args['--preview'],
+                 verbose: args['--verbose'],
+@@ -247220,7 +247242,7 @@ class LiftUp {
+                     options.n = maybeNumber;
+                 }
+             }
+-            yield ensureDatabaseExists_1.ensureDatabaseExists('apply', true, args['--create-db']);
++            yield ensureDatabaseExists_1.ensureDatabaseExists('apply', true, datamodelPath, args['--create-db']);
+             const result = yield lift.up(options);
+             lift.stop();
+             return result;
+@@ -255766,7 +255788,8 @@ const readFile = util_1.promisify(fs_1.default.readFile);
+ const exists = util_1.promisify(fs_1.default.exists);
+ const brightGreen = chalk_1.default.rgb(127, 224, 152);
+ class Lift {
+-    constructor(projectDir) {
++    constructor(projectDir, datamodelPath) {
++    		this.datamodelPath = datamodelPath;
+         // tslint:disable
+         this.watchUp = simpleDebounce_1.simpleDebounce(({ preview, providerAliases, clear, onWarnings, autoApprove } = { clear: true, providerAliases: {} }, renderer) => __awaiter(this, void 0, void 0, function* () {
+             var _a, _b, _c, _d;
+@@ -255815,7 +255838,7 @@ class Lift {
+                         });
+                 }
+                 const generators = yield sdk_1.getGenerators({
+-                    schemaPath: getDatamodelPath_1.getDatamodelPath(this.projectDir),
++                    schemaPath: datamodelPath,
+                     printDownloadProgress: false,
+                     version: packageJson.prisma.version,
+                     cliVersion: packageJson.version,
+@@ -255868,22 +255891,17 @@ class Lift {
+         // tsline:enable
+         this.datamodelBeforeWatch = '';
+         this.studioPort = 5555;
+-        this.projectDir = projectDir || this.getSchemaDir();
+-        const schemaPath = getDatamodelPath_1.getDatamodelPath(this.projectDir);
+-        this.engine = new LiftEngine_1.LiftEngine({ projectDir: this.projectDir, schemaPath });
++        this.projectDir = this.getSchemaDir();
++        this.engine = new LiftEngine_1.LiftEngine({ projectDir: this.projectDir, schemaPath: this.datamodelPath });
+     }
+     get devMigrationsDir() {
+         return path_1.default.join(this.projectDir, 'migrations/dev');
+     }
+     getSchemaDir() {
+-        const schemaPath = cli_1.getSchemaDirSync();
+-        if (!schemaPath) {
+-            throw new Error(`Could not find schema.prisma`);
+-        }
+-        return schemaPath;
++    		return require('path').dirname(this.datamodelPath);
+     }
+     getDatamodel() {
+-        return fs_1.default.readFileSync(getDatamodelPath_1.getDatamodelPath(this.projectDir), 'utf-8');
++        return fs_1.default.readFileSync(this.datamodelPath, 'utf-8');
+     }
+     // TODO: optimize datapaths, where we have a datamodel already, use it
+     getSourceConfig() {
+@@ -255918,9 +255936,9 @@ class Lift {
+             return LockFile_1.initLockFile();
+         });
+     }
+-    createMigration(migrationId) {
++    createMigration(migrationId, dir) {
+         return __awaiter(this, void 0, void 0, function* () {
+-            const { migrationsToApply, sourceConfig } = yield this.getMigrationsToApply();
++            const { migrationsToApply, sourceConfig } = yield this.getMigrationsToApply(dir);
+             const assumeToBeApplied = migrationsToApply.flatMap(m => m.datamodelSteps);
+             const datamodel = yield this.getDatamodel();
+             const { datamodelSteps, databaseSteps, warnings } = yield this.engine.inferMigrationSteps({
+@@ -255952,13 +255970,13 @@ class Lift {
+         const timestamp = now_1.now();
+         return timestamp + (name ? `-${dashify_1.default(name)}` : '');
+     }
+-    save(migration, name, preview) {
++    save(migration, dir, name, preview) {
+         return __awaiter(this, void 0, void 0, function* () {
+-            const migrationId = this.getMigrationId(name);
++            const migrationId = name || this.getMigrationId();
+             migration.id = migrationId;
+             const lockFile = yield this.getLockFile();
+             const { datamodel } = migration;
+-            const localMigrations = yield this.getLocalMigrations();
++            const localMigrations = yield this.getLocalMigrations(dir);
+             const lastMigration = localMigrations.length > 0 ? localMigrations[localMigrations.length - 1] : undefined;
+             // TODO better printing of params
+             const nameStr = name ? ` --name ${chalk_1.default.bold(name)}` : '';
+@@ -256348,9 +256366,9 @@ class Lift {
+             return migrationsWithDatabaseSteps.slice(fromIndex);
+         });
+     }
+-    getMigrationsToApply() {
++    getMigrationsToApply(dir) {
+         return __awaiter(this, void 0, void 0, function* () {
+-            const localMigrations = yield this.getLocalMigrations();
++            const localMigrations = yield this.getLocalMigrations(dir);
+             const sourceConfig = yield this.getSourceConfig();
+             const appliedRemoteMigrations = yield this.engine.listAppliedMigrations({ sourceConfig });
+             const appliedRemoteMigrationsWithoutWatch = appliedRemoteMigrations.filter(m => !isWatchMigrationName_1.isWatchMigrationName(m.id));
