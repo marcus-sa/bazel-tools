@@ -8,11 +8,15 @@
     "emitDecoratorMetadata": true,
     "moduleResolution": "node",
     "downlevelIteration": true,
-    "lib": ["esnext"],
+    "lib": ["esnext", "dom"],
     "baseUrl": ".",
+    "rootDirs": [
+      ".",
+      "dist/bin"
+    ],
     "paths": {
       // Must match workspace name
-      "bazel_tools/*": [
+      "nodejs_bazel_tools/*": [
         "dist/bin/*"
       ]
     },

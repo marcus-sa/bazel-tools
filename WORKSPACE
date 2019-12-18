@@ -1,8 +1,6 @@
 workspace(
-    name = "bazel_tools",
-    managed_directories = {
-        "@npm": ["node_modules"],
-    },
+    name = "nodejs_bazel_tools",
+    managed_directories = {"@npm": ["node_modules"]},
 )
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
