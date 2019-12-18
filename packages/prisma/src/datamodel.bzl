@@ -1,4 +1,4 @@
-load("//tools/prisma:providers.bzl", "PrismaDataModel")
+load(":providers.bzl", "PrismaDataModel")
 
 def _prisma_datamodel_impl(ctx):
     return [

@@ -1,6 +1,6 @@
 load("@bazel_skylib//lib:unittest.bzl", "analysistest", "asserts")
-load(":datasource.bzl", "prisma_datasource")
-load(":providers.bzl", "PrismaDataSource")
+load("//packages/prisma/src:datasource.bzl", "prisma_datasource")
+load("//packages/prisma/src:providers.bzl", "PrismaDataSource")
 
 def _datasource_provider_contents_test_impl(ctx):
     env = analysistest.begin(ctx)

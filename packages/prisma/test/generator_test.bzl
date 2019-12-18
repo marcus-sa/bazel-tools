@@ -1,6 +1,6 @@
 load("@bazel_skylib//lib:unittest.bzl", "analysistest", "asserts")
-load(":generator.bzl", "prisma_generator")
-load(":providers.bzl", "PrismaGenerator")
+load("//packages/prisma/src:generator.bzl", "prisma_generator")
+load("//packages/prisma/src:providers.bzl", "PrismaGenerator")
 
 def _generator_provider_contents_test_impl(ctx):
     env = analysistest.begin(ctx)

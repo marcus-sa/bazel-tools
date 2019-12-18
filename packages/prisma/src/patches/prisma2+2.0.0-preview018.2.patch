@@ -1,5 +1,5 @@
 diff --git a/node_modules/prisma2/build/index.js b/node_modules/prisma2/build/index.js
-index 14ff3ee..55abd97 100755
+index 14ff3ee..56ccac2 100755
 --- a/node_modules/prisma2/build/index.js
 +++ b/node_modules/prisma2/build/index.js
 @@ -12958,9 +12958,9 @@ const __1 = __webpack_require__(5487);
@@ -286,7 +286,15 @@ index 14ff3ee..55abd97 100755
          return __awaiter(this, void 0, void 0, function* () {
              // parse the arguments according to the spec
              const args = cli_1.arg(argv, {
-@@ -247203,7 +247225,7 @@ class LiftUp {
+@@ -247196,6 +247218,7 @@ class LiftUp {
+                 '--create-db': Boolean,
+                 '-c': '--create-db',
+                 '--auto-approve': Boolean,
++                '--migrations': String,
+             });
+             if (cli_1.isError(args)) {
+                 return this.help(args.message);
+@@ -247203,11 +247226,12 @@ class LiftUp {
              else if (args['--help']) {
                  return this.help();
              }
@@ -295,7 +303,12 @@ index 14ff3ee..55abd97 100755
              const options = {
                  preview: args['--preview'],
                  verbose: args['--verbose'],
-@@ -247220,7 +247242,7 @@ class LiftUp {
+                 autoApprove: args['--auto-approve'],
++                migrations: args['--migrations'],
+             };
+             if (args._.length > 0) {
+                 const thisArg = args._[0];
+@@ -247220,7 +247244,7 @@ class LiftUp {
                      options.n = maybeNumber;
                  }
              }
@@ -304,7 +317,7 @@ index 14ff3ee..55abd97 100755
              const result = yield lift.up(options);
              lift.stop();
              return result;
-@@ -255766,7 +255788,8 @@ const readFile = util_1.promisify(fs_1.default.readFile);
+@@ -255766,7 +255790,8 @@ const readFile = util_1.promisify(fs_1.default.readFile);
  const exists = util_1.promisify(fs_1.default.exists);
  const brightGreen = chalk_1.default.rgb(127, 224, 152);
  class Lift {
@@ -314,7 +327,7 @@ index 14ff3ee..55abd97 100755
          // tslint:disable
          this.watchUp = simpleDebounce_1.simpleDebounce(({ preview, providerAliases, clear, onWarnings, autoApprove } = { clear: true, providerAliases: {} }, renderer) => __awaiter(this, void 0, void 0, function* () {
              var _a, _b, _c, _d;
-@@ -255815,7 +255838,7 @@ class Lift {
+@@ -255815,7 +255840,7 @@ class Lift {
                          });
                  }
                  const generators = yield sdk_1.getGenerators({
@@ -323,7 +336,7 @@ index 14ff3ee..55abd97 100755
                      printDownloadProgress: false,
                      version: packageJson.prisma.version,
                      cliVersion: packageJson.version,
-@@ -255868,22 +255891,17 @@ class Lift {
+@@ -255868,22 +255893,17 @@ class Lift {
          // tsline:enable
          this.datamodelBeforeWatch = '';
          this.studioPort = 5555;
@@ -350,7 +363,25 @@ index 14ff3ee..55abd97 100755
      }
      // TODO: optimize datapaths, where we have a datamodel already, use it
      getSourceConfig() {
-@@ -255918,9 +255936,9 @@ class Lift {
+@@ -255903,24 +255923,24 @@ class Lift {
+             }
+         });
+     }
+-    getLockFile() {
++    getLockFile(migrationsDir) {
+         return __awaiter(this, void 0, void 0, function* () {
+-            const lockFilePath = path_1.default.resolve(this.projectDir, 'migrations', 'lift.lock');
++            const lockFilePath = path_1.default.resolve(migrationsDir, 'lift.lock');
+             if (yield exists(lockFilePath)) {
+                 const file = yield readFile(lockFilePath, 'utf-8');
+                 const lockFile = LockFile_1.deserializeLockFile(file);
+                 if (lockFile.remoteBranch) {
+                     // TODO: Implement handling the conflict
+-                    throw new Error(`There's a merge conflict in the ${chalk_1.default.bold('migrations/lift.lock')} file. Please execute ${chalk_1.default.greenBright('prisma lift fix')} to solve it`);
++                    throw new Error(`There's a merge conflict in the ${chalk_1.default.bold(migrationsDir + '/lift.lock')} file. Please execute ${chalk_1.default.greenBright('prisma lift fix')} to solve it`);
+                 }
+                 return lockFile;
+             }
              return LockFile_1.initLockFile();
          });
      }
@@ -362,7 +393,7 @@ index 14ff3ee..55abd97 100755
              const assumeToBeApplied = migrationsToApply.flatMap(m => m.datamodelSteps);
              const datamodel = yield this.getDatamodel();
              const { datamodelSteps, databaseSteps, warnings } = yield this.engine.inferMigrationSteps({
-@@ -255952,13 +255970,13 @@ class Lift {
+@@ -255952,13 +255972,13 @@ class Lift {
          const timestamp = now_1.now();
          return timestamp + (name ? `-${dashify_1.default(name)}` : '');
      }
@@ -372,14 +403,30 @@ index 14ff3ee..55abd97 100755
 -            const migrationId = this.getMigrationId(name);
 +            const migrationId = name || this.getMigrationId();
              migration.id = migrationId;
-             const lockFile = yield this.getLockFile();
+-            const lockFile = yield this.getLockFile();
++            const lockFile = yield this.getLockFile(dir);
              const { datamodel } = migration;
 -            const localMigrations = yield this.getLocalMigrations();
 +            const localMigrations = yield this.getLocalMigrations(dir);
              const lastMigration = localMigrations.length > 0 ? localMigrations[localMigrations.length - 1] : undefined;
              // TODO better printing of params
              const nameStr = name ? ` --name ${chalk_1.default.bold(name)}` : '';
-@@ -256348,9 +256366,9 @@ class Lift {
+@@ -256123,11 +256143,11 @@ class Lift {
+             return `🚀 Done with ${chalk_1.default.bold('down')} in ${formartms_1.formatms(Date.now() - before)}`;
+         });
+     }
+-    up({ n, preview, short, verbose, autoApprove, onWarnings } = {}) {
++    up({ n, preview, migrations, short, verbose, autoApprove, onWarnings } = {}) {
+         return __awaiter(this, void 0, void 0, function* () {
+-            yield this.getLockFile();
++            yield this.getLockFile(migrations);
+             const before = Date.now();
+-            const migrationsToApplyResult = yield this.getMigrationsToApply();
++            const migrationsToApplyResult = yield this.getMigrationsToApply(migrations);
+             const { lastAppliedIndex, localMigrations, appliedRemoteMigrations, sourceConfig } = migrationsToApplyResult;
+             let { migrationsToApply } = migrationsToApplyResult;
+             if (typeof n === 'number') {
+@@ -256348,9 +256368,9 @@ class Lift {
              return migrationsWithDatabaseSteps.slice(fromIndex);
          });
      }

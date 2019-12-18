@@ -6,30 +6,6 @@ _COMMON_ATTRS = {
     "bin": PRISMA_BIN_ATTR,
 }
 
-def _lift_impl(ctx):
-    ""
-
-lift = rule(
-    implementation = _lift_impl,
-    attrs = {
-        # Will be set by lift macros
-        "command": attr.string(
-            values = [
-                "up",
-                "save",
-                "down",
-            ],
-            mandatory = True,
-        ),
-        "migration_name": attr.string(
-            doc = "Only mandatory when saving a migration",
-        ),
-        # "migrations":
-        "schema": PRISMA_SCHEMA_ATTR,
-        "bin": PRISMA_BIN_ATTR,
-    },
-)
-
 def _lift_save_impl(ctx):
     migrations_dir = ctx.expand_make_variables("migrations_dir", ctx.attr.migrations_dir, {})
     migration_name = ctx.expand_make_variables("migration_name", ctx.attr.migration_name, {})
@@ -65,7 +41,7 @@ cp {migrations}/{name}/schema.prisma {schema_output}
 
     return [DefaultInfo(files = depset([steps, readme, schema]))]
 
-_lift_save = rule(
+lift_save = rule(
     implementation = _lift_save_impl,
     attrs = dict(_COMMON_ATTRS, **{
         "migrations_dir": attr.string(
@@ -84,38 +60,62 @@ _lift_save = rule(
     },
 )
 
-def lift_save(name, **kwargs):
-    nodejs_binary(
-        name = "%s_bin" % name,
-        data = ["@npm//prisma2"],
-        entry_point = PRISMA_DEFAULT_ENTRY_POINT,
-        visibility = ["//visibility:private"],
-    )
+def _find_migrations_dir_by_lockfile(files):
+    for file in files:
+        if file.extension == "lock":
+            return file.dirname
 
-    _lift_save(
-        name = name,
-        bin = ":%s_bin" % name,
-        **kwargs
-    )
-
-#def lift(schema, cmd, **kwargs):
-#    nodejs_binary(
-#        data = ["@npm//prisma2", schema],
-#        entry_point = PRISMA_DEFAULT_ENTRY_POINT,
-#        templated_args = [
-#            "lift",
-#            cmd,
-#            "--schema",
-#            "$(location %s)" % schema,
-#        ],
-#        **kwargs
-#    )
+    fail("No lockfile was found, thus the migrations directory could not be found")
 
 def _lift_up_impl(ctx):
-    ""
+    migrations_dir = _find_migrations_dir_by_lockfile(ctx.files.migrations)
+
+    # {bin} lift save --schema {schema} --migrations {migrations} --name {name}
+    #    ctx.actions.write(
+    #        output = ctx.outputs.launcher,
+    #        content = """
+    #{bin} lift up --schema {schema} --migrations {migrations}
+    #        """.format(
+    #            bin = ctx.executable.bin.short_path,
+    #            schema = ctx.file.schema.path,
+    #            migrations = migrations_dir,
+    #        ),
+    #        is_executable = True,
+    #    )
+    #
+
+    ctx.actions.run_shell(
+        outputs = [ctx.outputs.stamp],
+        tools = [ctx.executable.bin],
+        use_default_shell_env = True,
+        inputs = [ctx.file.schema] + ctx.files.migrations,
+        command = """
+{bin} lift up --schema {schema} --migrations {migrations}
+echo $(date '+%Y-%m-%d %H:%M:%S') >> {stamp}
+        """.format(
+            bin = ctx.executable.bin.path,
+            schema = ctx.file.schema.path,
+            migrations = migrations_dir,
+            stamp = ctx.outputs.stamp.path,
+        ),
+    )
+
+    return [DefaultInfo(files = depset([ctx.outputs.stamp]))]
+
+#    return [DefaultInfo(
+#        files = depset([ctx.outputs.launcher]),
+#        executable = ctx.outputs.launcher,
+#        runfiles = ctx.runfiles(
+#            # transitive_files = depset(transitive = [ctx.attr.bin[DefaultInfo].default_runfiles]),
+#            files = ctx.files.migrations + [ctx.file.schema, ctx.executable.bin],
+#            collect_data = True,
+#            collect_default = True,
+#        ),
+#    )]
 
 lift_up = rule(
     implementation = _lift_up_impl,
+    # executable = True,
     attrs = dict(_COMMON_ATTRS, **{
         "migrations": attr.label_list(
             allow_files = [
@@ -127,12 +127,14 @@ lift_up = rule(
             mandatory = True,
             allow_empty = False,
         ),
+        #        "_runfiles": attr.label(
+        #            default = Label("@bazel_tools//tools/bash/runfiles"),
+        #        ),
     }),
+    outputs = {
+        "stamp": "STAMP",
+    },
+    #    outputs = {
+    #        "launcher": "%{name}_launcher.sh",
+    #    },
 )
-
-def lift_down(schema, **kwargs):
-    lift(
-        schema = schema,
-        command = "down",
-        **kwargs
-    )

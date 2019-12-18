@@ -1,4 +1,5 @@
 load("@npm_bazel_typescript//:index.bzl", "ts_library")
+load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_binary")
 load("//tools:js_sources.bzl", "js_sources")
 load(
     "//packages/prisma/src:index.bzl",
@@ -15,11 +16,11 @@ prisma_datasource(
     name = "postgres_datasource",
     provider = "postgresql",
     # --define datasource=postgres://prisma:prisma@localhost:5432/prisma
-    url = "$(datasource)",
+    # url = "$(datasource)",
     # Prisma requires the environment variable to be set at generation time instead of runtime
     # so when running the generator you can just set it as empty
     # --action_env PRISMA_POSTGRES_URL=
-    # url = 'env("PRISMA_POSTGRES_URL")',
+    url = 'env("PRISMA_POSTGRES_URL")',
 )
 
 prisma_generator(
@@ -53,7 +54,6 @@ lift_save(
     migration_name = "$(name)",
     # --define directory=$(pwd)/examples/prisma/migrations
     migrations_dir = "$(directory)",
-    #    migrations = glob(["migrations/**"]),
     schema = ":schema",
     tags = ["manual"],
 )
@@ -69,7 +69,22 @@ js_sources(
 )
 
 ts_library(
-    name = "example",
+    name = "prisma",
     srcs = ["index.ts"],
     deps = [":client"],
+)
+
+ts_library(
+    name = "seed_lib",
+    srcs = ["seed.ts"],
+    deps = [":prisma"],
+)
+
+nodejs_binary(
+    name = "seed",
+    data = [
+        ":photonjs",
+        ":seed_lib",
+    ],
+    entry_point = ":seed.ts",
 )
