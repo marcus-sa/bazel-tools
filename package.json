@@ -3,6 +3,9 @@
   "homepage": "https://github.com/marcus-sa/bazel-tools",
   "repository": "https://github.com/marcus-sa/bazel-tools",
   "license": "MIT",
+  "scripts": {
+    "postinstall": "patch-package --patch-dir packages/prisma/src/patches"
+  },
 	"devDependencies": {
 		"patch-package": "6.2.0",
 		"prisma2": "2.0.0-preview018.2",
@@ -13,6 +16,7 @@
     "@bazel/bazel": "1.2.0",
     "@bazel/typescript": "0.42.3",
     "@bazel/buildifier": "0.29.0",
-    "@bazel/hide-bazel-files": "0.42.3"
+    "@bazel/hide-bazel-files": "0.42.3",
+    "typescript": "3.7.3"
   }
 }
