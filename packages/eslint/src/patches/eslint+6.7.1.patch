@@ -1,0 +1,22 @@
+diff --git a/node_modules/eslint/lib/cli.js b/node_modules/eslint/lib/cli.js
+index 18a917c..7156769 100644
+--- a/node_modules/eslint/lib/cli.js
++++ b/node_modules/eslint/lib/cli.js
+@@ -154,6 +154,17 @@ const cli = {
+
+         try {
+             currentOptions = options.parse(args);
++
++            const cwd = process.cwd();
++            const dirToRemove = path.basename(cwd) + "/";
++
++            if (currentOptions.config) {
++              currentOptions.config = currentOptions.config.replace(dirToRemove, '');
++            }
++
++            if (currentOptions._) {
++              currentOptions._ = currentOptions._.map(file => file.replace(dirToRemove, ''));
++            }
+         } catch (error) {
+             log.error(error.message);
+             return 2;

@@ -1,0 +1,29 @@
+{
+  "name": "@bazel-tools/eslint",
+  "license": "MIT",
+  "version": "0.0.0-PLACEHOLDER",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marcus-sa/bazel-tools",
+    "directory": "packages/eslint"
+  },
+  "bugs": {
+    "url": "https://github.com/marcus-sa/bazel-tools/issues"
+  },
+  "keywords": [
+    "bazel",
+    "eslint"
+  ],
+  "dependencies": {
+    "eslint": "6.7.2",
+    "patch-package": "6.2.0"
+  },
+  "scripts": {
+    "postinstall": "patch-package"
+  },
+  "bazelWorkspaces": {
+    "npm_bazel_tools_eslint": {
+      "rootPath": "."
+    }
+  }
+}

@@ -3,6 +3,17 @@ workspace(
     managed_directories = {"@npm": ["node_modules"]},
 )
 
+#
+# Nested package worksapces required to build packages & reference rules
+#
+
+load("//packages:index.bzl", "NESTED_PACKAGES")
+
+[local_repository(
+    name = "npm_bazel_tools_%s" % name,
+    path = "packages/%s/src" % name,
+) for name in NESTED_PACKAGES]
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 

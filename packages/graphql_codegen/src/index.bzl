@@ -85,17 +85,17 @@ _graphql_codegen = rule(
 def graphql_codegen(
         name,
         deps = [],
-        entry_point = "@npm_bazel_tools_graphql_codegen//:node_modules/@graphql-codegen/cli/bin.js",
+        entry_point = "@npm//:node_modules/@graphql-codegen/cli/bin.js",
         **kwargs):
     nodejs_binary(
         name = "%s_bin" % name,
         entry_point = entry_point,
         install_source_map_support = False,
-        data = [
-            "@npm_bazel_tools_graphql_codegen//@graphql-codegen/cli",
-            "@npm_bazel_tools_graphql_codegen//json-to-pretty-yaml",
-            "@npm_bazel_tools_graphql_codegen//listr-update-renderer",
-        ] + deps,
+        data = deps + [
+            "@npm//@graphql-codegen/cli",
+            "@npm//json-to-pretty-yaml",
+            "@npm//listr-update-renderer",
+        ],
         visibility = ["//visibility:private"],
     )
 

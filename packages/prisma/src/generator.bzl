@@ -23,16 +23,16 @@ generator %s {
     data = data.strip()
 
     # TODO: Use Bazel builtin tools for this
-    #    if len(ctx.attr.binary_targets) > 0:
-    #        data += """
-    #  binaryTargets = ["{TMPL_binary_targets}"]
-    #        """.format(
-    #            TMPL_binary_targets = '", "'.join([
-    #                bt
-    #                for bt in ctx.attr.binary_targets
-    #            ]),
-    #        )
-    #        data = data.strip()
+    if len(ctx.attr.binary_targets) > 0:
+        data += """
+  binaryTargets = ["{TMPL_binary_targets}"]
+            """.format(
+            TMPL_binary_targets = '", "'.join([
+                bt
+                for bt in ctx.attr.binary_targets
+            ]),
+        )
+        data = data.strip()
 
     data += """
 }
@@ -41,7 +41,6 @@ generator %s {
     return [PrismaGenerator(
         data = data.strip(),
         outputs = outputs,
-        # binary =
     )]
 
 prisma_generator = rule(
@@ -61,9 +60,10 @@ prisma_generator = rule(
         #            ],
         #            mandatory = True,
         #        ),
-        #        "binary_targets": attr.string_list(
-        #            # allow_empty = False,
-        #            # mandatory = False,
-        #        ),
+        "binary_targets": attr.string_list(
+            default = ["native"],
+            # allow_empty = False,
+            # mandatory = False,
+        ),
     },
 )

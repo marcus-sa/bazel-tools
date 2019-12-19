@@ -4,6 +4,7 @@
   "repository": "https://github.com/marcus-sa/bazel-tools",
   "license": "MIT",
   "scripts": {
+    "skydoc": "bazel build //docs && cp -f dist/bin/docs/*.md docs",
     "postinstall": "patch-package --patch-dir packages/prisma/src/patches"
   },
 	"devDependencies": {
