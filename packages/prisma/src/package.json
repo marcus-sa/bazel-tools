@@ -23,7 +23,7 @@
     "postinstall": "patch-package"
   },
   "bazelWorkspaces": {
-    "npm_bazel_tools_eslint": {
+    "npm_bazel_tools_prisma": {
       "rootPath": "."
     }
   }

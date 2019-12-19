@@ -1,5 +1,5 @@
 {
-	"name": "nodejs_bazel_tools",
+	"name": "npm_bazel_tools",
   "homepage": "https://github.com/marcus-sa/bazel-tools",
   "repository": "https://github.com/marcus-sa/bazel-tools",
   "license": "MIT",

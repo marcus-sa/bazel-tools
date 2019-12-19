@@ -16,7 +16,7 @@
     ],
     "paths": {
       // Must match workspace name
-      "nodejs_bazel_tools/*": [
+      "npm_bazel_tools/*": [
         "dist/bin/*"
       ]
     },

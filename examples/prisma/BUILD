@@ -17,6 +17,7 @@ prisma_datasource(
     provider = "postgresql",
     # --define datasource=postgres://prisma:prisma@localhost:5432/prisma
     # url = "$(datasource)",
+    # HINT: cannot be used because environment is not inherited https://github.com/prisma/prisma2/issues/1053#issuecomment-567183500
     # Prisma requires the environment variable to be set at generation time instead of runtime
     # so when running the generator you can just set it as empty
     # --action_env PRISMA_POSTGRES_URL=
@@ -82,6 +83,9 @@ ts_library(
 
 nodejs_binary(
     name = "seed",
+    configuration_env_vars = [
+        "PRISMA_POSTGRES_URL",
+    ],
     data = [
         ":photonjs",
         ":seed_lib",
