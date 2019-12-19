@@ -10,7 +10,7 @@
 	"devDependencies": {
 		"patch-package": "6.2.0",
 		"prisma2": "2.0.0-preview018.2",
-    "@prisma/photon": "2.0.0-preview018.2",
+    "@prisma/photon": "2.0.0-preview019",
     "@graphql-codegen/cli": "1.9.1",
     "json-to-pretty-yaml": "1.2.2",
     "listr-update-renderer": "0.5.0",
