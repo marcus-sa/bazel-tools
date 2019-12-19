@@ -18,7 +18,7 @@
   "dependencies": {
     "patch-package": "6.2.0",
     "prisma2": "2.0.0-preview018.2",
-    "@prisma/photon": "2.0.0-preview018.2"
+    "@prisma/photon": "2.0.0-preview019"
   },
   "scripts": {
     "postinstall": "patch-package"
