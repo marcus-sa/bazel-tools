@@ -16,7 +16,7 @@
     "listr-update-renderer": "0.5.0",
     "@bazel/bazel": "1.2.0",
     "@bazel/typescript": "0.42.3",
-    "@bazel/buildifier": "0.29.0",
+    "@bazel/buildifier": "2.2.1",
     "@bazel/hide-bazel-files": "0.42.3",
     "typescript": "3.7.3"
   }
