@@ -9,7 +9,7 @@
   },
 	"devDependencies": {
 		"patch-package": "6.2.0",
-		"prisma2": "2.0.0-preview018.2",
+		"prisma2": "2.0.0-previewnull-1",
     "@prisma/photon": "2.0.0-preview018.2",
     "@graphql-codegen/cli": "1.9.1",
     "json-to-pretty-yaml": "1.2.2",

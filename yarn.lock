@@ -2695,10 +2695,10 @@ prettier@1.19.1:
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.19.1.tgz#f7d7f5ff8a9cd872a7be4ca142095956a60797cb"
   integrity sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew==
 
-prisma2@2.0.0-preview018.2:
-  version "2.0.0-preview018.2"
-  resolved "https://registry.yarnpkg.com/prisma2/-/prisma2-2.0.0-preview018.2.tgz#404a56d3d4be95f4e19819e9bea43efaebf2b34e"
-  integrity sha512-/0ulQKc4dCk37AGvVq8KlLRPqwv4AnuCTf/vjDaMBh1yfeaIP4ZHtAsujz53jsv1VIJs4fClKq/hTyyGWAPZLQ==
+prisma2@2.0.0-previewnull-1:
+  version "2.0.0-previewnull-1"
+  resolved "https://registry.yarnpkg.com/prisma2/-/prisma2-2.0.0-previewnull-1.tgz#18d17d05ada12df272ce023bd491f0316b71c584"
+  integrity sha512-tileM0fP3FkNYkxUe/YFCCgkkuDXFLCCykJinMi72ss0riinJ3GCLuCq/xC3CjjpA9wwh5ep201ws2UQi4yIEA==
 
 protobufjs@6.8.8:
   version "6.8.8"
