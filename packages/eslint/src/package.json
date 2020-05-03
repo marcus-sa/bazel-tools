@@ -16,7 +16,7 @@
   ],
   "dependencies": {
     "eslint": "6.7.2",
-    "patch-package": "6.2.0"
+    "patch-package": "6.2.2"
   },
   "scripts": {
     "postinstall": "patch-package"
