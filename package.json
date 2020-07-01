@@ -17,7 +17,7 @@
     "@bazel/bazel": "1.2.0",
     "@bazel/typescript": "0.42.3",
     "@bazel/buildifier": "0.29.0",
-    "@bazel/hide-bazel-files": "0.42.3",
+    "@bazel/hide-bazel-files": "1.7.0",
     "typescript": "3.7.3"
   }
 }
