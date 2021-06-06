@@ -15,7 +15,7 @@
     "eslint"
   ],
   "dependencies": {
-    "eslint": "6.7.2",
+    "eslint": "7.28.0",
     "patch-package": "6.2.0"
   },
   "scripts": {
