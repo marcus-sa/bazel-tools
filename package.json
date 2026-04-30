@@ -8,7 +8,7 @@
     "postinstall": "patch-package --patch-dir packages/prisma/src/patches"
   },
 	"devDependencies": {
-		"patch-package": "6.2.0",
+		"patch-package": "6.5.1",
 		"prisma2": "2.0.0-preview018.2",
     "@prisma/photon": "2.0.0-preview018.2",
     "@graphql-codegen/cli": "1.9.1",
